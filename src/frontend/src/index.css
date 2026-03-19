@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Yunazz Clothing Hub — Warm Ivory + Deep Charcoal luxury palette */
+    --background: 0.97 0.008 85;
+    --foreground: 0.18 0.01 60;
+
+    --card: 0.97 0.008 85;
+    --card-foreground: 0.18 0.01 60;
+
+    --popover: 0.97 0.008 85;
+    --popover-foreground: 0.18 0.01 60;
+
+    --primary: 0.18 0.01 60;
+    --primary-foreground: 0.97 0.008 85;
+
+    --secondary: 0.93 0.012 75;
+    --secondary-foreground: 0.18 0.01 60;
+
+    --muted: 0.93 0.012 75;
+    --muted-foreground: 0.52 0.015 65;
+
+    --accent: 0.93 0.012 75;
+    --accent-foreground: 0.18 0.01 60;
+
+    --destructive: 0.54 0.22 27;
+    --destructive-foreground: 0.97 0.008 85;
+
+    --border: 0.88 0.012 75;
+    --input: 0.88 0.012 75;
+    --ring: 0.18 0.01 60;
+
+    --gold: 0.72 0.12 75;
+    --gold-foreground: 0.18 0.01 60;
+
+    --radius: 0rem;
+
+    --chart-1: 0.72 0.12 75;
+    --chart-2: 0.62 0.14 200;
+    --chart-3: 0.55 0.18 300;
+    --chart-4: 0.65 0.16 140;
+    --chart-5: 0.58 0.2 30;
+
+    --sidebar: 0.97 0.008 85;
+    --sidebar-foreground: 0.18 0.01 60;
+    --sidebar-primary: 0.18 0.01 60;
+    --sidebar-primary-foreground: 0.97 0.008 85;
+    --sidebar-accent: 0.93 0.012 75;
+    --sidebar-accent-foreground: 0.18 0.01 60;
+    --sidebar-border: 0.88 0.012 75;
+    --sidebar-ring: 0.18 0.01 60;
+  }
+
+  .dark {
+    --background: 0.13 0.01 60;
+    --foreground: 0.95 0.008 85;
+
+    --card: 0.16 0.01 60;
+    --card-foreground: 0.95 0.008 85;
+
+    --popover: 0.16 0.01 60;
+    --popover-foreground: 0.95 0.008 85;
+
+    --primary: 0.95 0.008 85;
+    --primary-foreground: 0.13 0.01 60;
+
+    --secondary: 0.22 0.012 60;
+    --secondary-foreground: 0.95 0.008 85;
+
+    --muted: 0.22 0.012 60;
+    --muted-foreground: 0.6 0.015 65;
+
+    --accent: 0.22 0.012 60;
+    --accent-foreground: 0.95 0.008 85;
+
+    --destructive: 0.54 0.22 27;
+    --destructive-foreground: 0.95 0.008 85;
+
+    --border: 0.25 0.012 60;
+    --input: 0.25 0.012 60;
+    --ring: 0.95 0.008 85;
+
+    --gold: 0.72 0.12 75;
+    --gold-foreground: 0.13 0.01 60;
+
+    --sidebar: 0.16 0.01 60;
+    --sidebar-foreground: 0.95 0.008 85;
+    --sidebar-primary: 0.95 0.008 85;
+    --sidebar-primary-foreground: 0.13 0.01 60;
+    --sidebar-accent: 0.22 0.012 60;
+    --sidebar-accent-foreground: 0.95 0.008 85;
+    --sidebar-border: 0.25 0.012 60;
+    --sidebar-ring: 0.95 0.008 85;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Fraunces", serif;
+    font-weight: 300;
+  }
+}

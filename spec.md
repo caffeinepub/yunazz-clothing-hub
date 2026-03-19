@@ -1,43 +1,24 @@
 # Yunazz Clothing Hub
 
 ## Current State
-New project. No existing code or backend.
+Full-stack clothing store with public site (hero, shop, about, contact) and admin panel at `/admin`. Backend has product CRUD with authorization. Frontend has admin panel with product form, image upload, and edit/delete. Issue: new users logging in for the first time see "Access Denied" because there's no way to bootstrap the first admin.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Homepage with hero banner section showcasing the brand
-- Product catalog/shop section with clothing items (photo, name, price, category, description)
-- About Us section with brand story content
-- Contact section with contact information and form
-- Admin management panel (protected) for adding, editing, and removing products
-- Product data model: id, name, description, price, category, imageId (blob), createdAt
-- Categories: Men, Women, Accessories, Outerwear
-- Sample seed products for demonstration
+- `claimFirstAdmin()` backend function: grants caller admin role only if zero admins exist (first-time bootstrap)
+- Admin panel: "Claim Admin Access" button shown when logged in but not admin, calls `claimFirstAdmin()` then re-checks admin status
+- Better error handling/feedback in the product form
 
 ### Modify
-- N/A (new project)
+- Admin panel UI: clearer onboarding flow for first-time admin setup
+- Product form: ensure image is optional (product can be saved without image)
 
 ### Remove
-- N/A (new project)
+- Nothing removed
 
 ## Implementation Plan
-
-### Backend (Motoko)
-- Product record type: { id, name, description, price, category, imageId, createdAt }
-- CRUD operations: addProduct, updateProduct, removeProduct, getProducts, getProduct
-- Authorization: admin-only write operations, public read
-- Blob storage integration for product images
-
-### Frontend
-- Navigation bar with links: Home, Shop, About, Contact, Admin (admin-only)
-- Hero section: full-width banner with brand tagline and CTA button to shop
-- Shop/Catalog section: product grid with filter by category, product cards (image, name, price, category badge)
-- Product detail modal or card expand view
-- About Us section: brand story, values, mission
-- Contact section: contact form (name, email, message) and brand contact info
-- Admin panel (protected route/section):
-  - Product list with edit/delete per item
-  - Add product form: name, description, price, category, image upload
-  - Edit product form: pre-filled fields
-  - Confirmation dialogs for delete
+1. Regenerate Motoko backend with `claimFirstAdmin()` function added
+2. Update frontend AdminPanel to show claim-admin UI when logged in but not admin
+3. Update useQueries hook to expose `useClaimFirstAdmin` mutation
+4. Ensure product form validation allows saving without an image

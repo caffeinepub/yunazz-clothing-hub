@@ -27,6 +27,7 @@ export enum UserRole {
 export interface backendInterface {
     addProduct(name: string, description: string, price: number, category: string, imageId: string): Promise<Product>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimFirstAdmin(): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getProduct(id: bigint): Promise<Product | null>;

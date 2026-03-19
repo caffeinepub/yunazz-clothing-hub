@@ -11,6 +11,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -45,6 +52,7 @@ import {
   LogOut,
   Pencil,
   Plus,
+  ShieldCheck,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -57,6 +65,7 @@ import { CATEGORIES, SEED_PRODUCTS } from "../data/seedProducts";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import {
   useAddProduct,
+  useClaimFirstAdmin,
   useIsAdmin,
   useProducts,
   useRemoveProduct,
@@ -107,6 +116,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   const addProduct = useAddProduct();
   const updateProduct = useUpdateProduct();
   const removeProduct = useRemoveProduct();
+  const claimFirstAdmin = useClaimFirstAdmin();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -234,6 +244,16 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
     }
   };
 
+  const handleClaimAdmin = async () => {
+    try {
+      await claimFirstAdmin.mutateAsync();
+      toast.success("You now have admin access!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Admin access already claimed. Contact your store owner.");
+    }
+  };
+
   const isLoggedIn = !!identity;
   const isLoggingIn = loginStatus === "logging-in";
 
@@ -323,19 +343,59 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           </motion.div>
         )}
 
-        {/* Admin check */}
+        {/* Claim Admin UI — logged in but no admin role yet */}
         {isLoggedIn && !isAdminLoading && !isAdmin && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-32 text-center"
+            className="flex flex-col items-center justify-center py-24"
           >
-            <h2 className="font-display text-3xl font-light text-foreground mb-3">
-              Access Denied
-            </h2>
-            <p className="text-muted-foreground text-sm">
-              Your account does not have admin privileges.
-            </p>
+            <Card
+              data-ocid="admin.claim.card"
+              className="max-w-md w-full rounded-none border-border shadow-none"
+            >
+              <CardHeader className="text-center pb-4">
+                <div className="w-14 h-14 bg-foreground/8 flex items-center justify-center mx-auto mb-4">
+                  <ShieldCheck size={26} className="text-foreground" />
+                </div>
+                <CardTitle className="font-display text-2xl font-light text-foreground">
+                  Claim Admin Access
+                </CardTitle>
+                <CardDescription className="text-muted-foreground text-sm mt-2">
+                  If you are the store owner, you can claim admin access now.
+                  This is only available once — the first person to claim it
+                  becomes the administrator.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button
+                  data-ocid="admin.claim.primary_button"
+                  onClick={handleClaimAdmin}
+                  disabled={claimFirstAdmin.isPending}
+                  className="w-full rounded-none bg-foreground text-background hover:bg-foreground/90 text-xs tracking-widest uppercase font-medium h-12 gap-2"
+                >
+                  {claimFirstAdmin.isPending ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <ShieldCheck size={14} />
+                  )}
+                  {claimFirstAdmin.isPending
+                    ? "Claiming..."
+                    : "Claim Admin Access"}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Not the store owner?{" "}
+                  <button
+                    type="button"
+                    onClick={clear}
+                    className="underline underline-offset-2 hover:text-foreground transition-colors"
+                  >
+                    Log out
+                  </button>{" "}
+                  and contact your store administrator.
+                </p>
+              </CardContent>
+            </Card>
           </motion.div>
         )}
 
@@ -588,11 +648,16 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
               </div>
             </div>
 
-            {/* Image upload */}
+            {/* Image upload (optional) */}
             <div className="space-y-2">
-              <Label className="text-xs tracking-widest uppercase text-muted-foreground font-medium">
-                Product Image
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs tracking-widest uppercase text-muted-foreground font-medium">
+                  Product Image
+                </Label>
+                <span className="text-xs text-muted-foreground italic">
+                  Optional
+                </span>
+              </div>
               <div className="border border-border p-4 space-y-3">
                 {imagePreview ? (
                   <div className="relative">

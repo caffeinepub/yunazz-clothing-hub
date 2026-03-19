@@ -3,17 +3,19 @@ import Array "mo:core/Array";
 import Time "mo:core/Time";
 import Runtime "mo:core/Runtime";
 import Text "mo:core/Text";
-import Map "mo:core/Map";
 import Iter "mo:core/Iter";
+import Map "mo:core/Map";
 import Principal "mo:core/Principal";
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   let products = Map.empty<Nat, Product>();
-  let userProfiles = Map.empty<Principal, UserProfile>();
+  let userProfiles = Map.empty<Principal, InternalUserProfile>();
   include MixinAuthorization(accessControlState);
   include MixinStorage();
 
@@ -31,28 +33,50 @@ actor {
     name : Text;
   };
 
+  // Internal representation with metadata
+  type InternalUserProfile = {
+    profile : UserProfile;
+    createdAt : Int;
+    updatedAt : Int;
+  };
+
   var nextProductId = 0;
+  var firstAdminClaimed = false;
 
   // User Profile Functions
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access profiles");
     };
-    userProfiles.get(caller);
+    switch (userProfiles.get(caller)) {
+      case (null) { null };
+      case (?internal) { ?internal.profile };
+    };
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Can only view your own profile");
     };
-    userProfiles.get(user);
+    switch (userProfiles.get(user)) {
+      case (null) { null };
+      case (?internal) { ?internal.profile };
+    };
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can save profiles");
     };
-    userProfiles.add(caller, profile);
+
+    let currentTime = Time.now();
+    let userProfile = {
+      profile;
+      createdAt = currentTime;
+      updatedAt = currentTime;
+    };
+
+    userProfiles.add(caller, userProfile);
   };
 
   // Product Query Functions (Public - No Auth Required)
@@ -120,5 +144,19 @@ actor {
     let existed = products.containsKey(id);
     products.remove(id);
     existed;
+  };
+
+  // Claim first admin function
+  public shared ({ caller }) func claimFirstAdmin() : async () {
+    // Check if first admin has already been claimed
+    if (firstAdminClaimed) {
+      Runtime.trap("Unauthorized: First admin has already been claimed");
+    };
+
+    // Assign admin role to caller
+    AccessControl.assignRole(accessControlState, caller, caller, #admin);
+
+    // Mark that first admin has been claimed
+    firstAdminClaimed := true;
   };
 };
